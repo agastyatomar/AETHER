@@ -86,7 +86,7 @@ describe("ShareDialog", () => {
     expect(screen.getByTestId("share-x")).toBeDefined();
     // The repo URL is baked into the card (preview + capture copies).
     expect(
-      screen.getAllByText(/github\.com\/AETHER\/AETHER/).length,
+      screen.getAllByText(/github\.com\/agastyatomar\/AETHER/).length,
     ).toBeGreaterThan(0);
     // Hero number rendered (locale-agnostic — matches whatever separator
     // toLocaleString uses in the test environment).
