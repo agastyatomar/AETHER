@@ -24,7 +24,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -40,7 +40,7 @@ jobs:
     steps:
       # The geocoder belongs to the website. Pin reviewed code: it runs with
       # this repository's token, never a contributor-controlled checkout.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: PersonalJarvis/personaljarvis.github.io
           ref: 70125a6f2206415a60f15cdf99921f7b0dd4f0f2
