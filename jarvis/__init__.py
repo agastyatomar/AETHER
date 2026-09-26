@@ -1,0 +1,3 @@
+"""AETHER — a voice-driven, cross-platform meta-orchestrator."""
+
+__version__ = "2.3.2"
