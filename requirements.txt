@@ -1,0 +1,14 @@
+# AETHER Core Dependencies
+# Install with: pip install -r requirements.txt
+# For development: pip install -r requirements-dev.txt
+
+pydantic>=2.8.0
+aiosqlite>=0.20.0
+filelock>=3.15.0
+
+# Optional: watchdog for hot-reload (docs, skills)
+# watchdog>=4.0.0
+
+# Optional: browser automation (installed in isolated venv via aether-browser-install)
+# browser-use>=0.13.10
+# playwright>=1.62.0

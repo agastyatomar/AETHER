@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  aether:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: aether:latest
+    container_name: aether
+    environment:
+      - AETHER_DATA_DIR=/data/aether
+    volumes:
+      - aether-data:/data/aether
+      - ./aether:/app/aether:ro  # For development hot-reload
+    stdin_open: true
+    tty: true
+    command: ["--help"]
+
+  aether-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: aether-dev:latest
+    container_name: aether-dev
+    environment:
+      - AETHER_DATA_DIR=/data/aether
+      - PYTHONPATH=/app
+    volumes:
+      - aether-data:/data/aether
+      - ./:/app
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    command: ["bash"]
+
+  aether-browser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: aether-browser:latest
+    container_name: aether-browser
+    environment:
+      - AETHER_DATA_DIR=/data/aether
+      - PLAYWRIGHT_BROWSERS_PATH=/data/aether/browsers
+    volumes:
+      - aether-data:/data/aether
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro  # For headed mode
+    devices:
+      - /dev/dri:/dev/dri  # GPU acceleration
+    command: ["aether-browser-install", "--system-deps", "--probe"]
+
+volumes:
+  aether-data:
+    driver: local
+
+networks:
+  default:
+    name: aether-network

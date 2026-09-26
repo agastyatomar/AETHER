@@ -1,0 +1,16 @@
+# AETHER Demo Placeholder
+
+This is a placeholder for the demo.gif file.
+Replace with actual demo recording.
+
+To create a demo:
+1. Run AETHER with a sample request
+2. Record screen using your preferred tool
+3. Convert to GIF (recommended: 800x450, 10-15fps)
+4. Save as assets/demo.gif
+
+Example tools:
+- Linux: `peek`, `gifine`, `byzanz`
+- macOS: `kap`, `gifox`
+- Windows: `screenToGif`, `licecap`
+- Cross-platform: `asciinema` + `agg`
