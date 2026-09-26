@@ -89,7 +89,7 @@ describe("the skills.sh target", () => {
       skillsShTarget("three-point-check", {
         sourceUrl: "https://github.com/agastyatomar/marketplace",
       }),
-    ).toEqual({ repo: "AETHER/marketplace", skill: "three-point-check" });
+    ).toEqual({ repo: "agastyatomar/marketplace", skill: "three-point-check" });
   });
 
   it("prefers the raw URL over the repository URL", () => {

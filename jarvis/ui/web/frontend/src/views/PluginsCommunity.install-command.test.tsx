@@ -125,7 +125,7 @@ describe("the install command inside the consent dialog", () => {
 
     expect(
       screen.getByText(
-        "npx skills add AETHER/marketplace --skill three-point-check",
+        "npx skills add agastyatomar/marketplace --skill three-point-check",
         { exact: false },
       ),
     ).toBeDefined();
