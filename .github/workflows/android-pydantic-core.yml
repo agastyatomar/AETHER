@@ -51,13 +51,13 @@ jobs:
           cp "$LIBDL_PATH" "$MOCK_DIR/"
           SYSCONFIG_NAME="_sysconfigdata__linux_aarch64-linux-android"
           cat > "$MOCK_DIR/${SYSCONFIG_NAME}.py" <<EOF
-build_time_vars = {
-    "abiflags": "", "ABIFLAGS": "", "SO": ".so", "SOABI": "cpython-314",
-    "EXT_SUFFIX": ".so", "LIBDIR": "$MOCK_DIR", "LDLIBRARY": "libpython3.14.so",
-    "Py_ENABLE_SHARED": 1, "CC": "clang", "CXX": "clang++", "VERSION": "3.14",
-    "LDSHARED": "clang -shared", "LDFLAGS": "-L$MOCK_DIR", "CCSHARED": "-fPIC",
-    "GNULD": "yes", "Py_DEBUG": 0, "WITH_PYMALLOC": 1,
-}
+          build_time_vars = {
+              "abiflags": "", "ABIFLAGS": "", "SO": ".so", "SOABI": "cpython-314",
+              "EXT_SUFFIX": ".so", "LIBDIR": "$MOCK_DIR", "LDLIBRARY": "libpython3.14.so",
+              "Py_ENABLE_SHARED": 1, "CC": "clang", "CXX": "clang++", "VERSION": "3.14",
+              "LDSHARED": "clang -shared", "LDFLAGS": "-L$MOCK_DIR", "CCSHARED": "-fPIC",
+              "GNULD": "yes", "Py_DEBUG": 0, "WITH_PYMALLOC": 1,
+          }
 EOF
           mkdir build-src && cd build-src
           pip download "pydantic-core==${PYDANTIC_CORE_VERSION}" --no-binary :all: --no-deps
