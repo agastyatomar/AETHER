@@ -134,6 +134,7 @@ install_package() {
     else
         "$PYTHON" -m pip install -e "$INSTALL_DIR"
     fi
+}
 
 install_browser() {
     [[ "$INSTALL_BROWSER" != true ]] && return 0
