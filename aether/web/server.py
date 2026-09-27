@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -25,6 +26,10 @@ class RequestPayload(BaseModel):
 class CommandPayload(BaseModel):
     command: str
     args: list[str] = []
+
+
+DEMO_MODE = os.getenv("AETHER_DEMO_MODE", "").lower() in {"1", "true", "yes"}
+SAFE_COMMANDS = {"aether", "aether-society", "aether-browser-install"}
 
 
 @app.get("/")
@@ -285,18 +290,20 @@ async def version() -> dict[str, str]:
 
 @app.post("/api/run")
 async def run_request(payload: RequestPayload) -> dict[str, Any]:
-    """Execute aether run command."""
+    """Run an AETHER request unless public-demo mode disables execution."""
+    if DEMO_MODE:
+        return {"output": ["Request execution is disabled in public demo mode."], "returncode": 403}
     try:
         proc = subprocess.run(
             [sys.executable, "-m", "aether", "run", payload.request],
             capture_output=True,
             text=True,
             timeout=300,
-            cwd=Path(__file__).parents[2]
+            cwd=Path(__file__).parents[2],
         )
-        output = proc.stdout.strip().split('\n') if proc.stdout else []
+        output = proc.stdout.strip().split("\n") if proc.stdout else []
         if proc.stderr:
-            output.extend(proc.stderr.strip().split('\n'))
+            output.extend(proc.stderr.strip().split("\n"))
         return {"output": output, "returncode": proc.returncode}
     except subprocess.TimeoutExpired:
         return {"output": ["Error: Request timed out"], "returncode": -1}
@@ -306,7 +313,11 @@ async def run_request(payload: RequestPayload) -> dict[str, Any]:
 
 @app.post("/api/command")
 async def run_command(payload: CommandPayload) -> dict[str, Any]:
-    """Execute any aether command."""
+    """Execute an allow-listed AETHER command."""
+    if DEMO_MODE:
+        return {"output": ["Command execution is disabled in public demo mode."], "returncode": 403}
+    if payload.command not in SAFE_COMMANDS:
+        return {"output": ["Command is not allow-listed."], "returncode": 403}
     try:
         cmd = [payload.command] + payload.args
         proc = subprocess.run(
