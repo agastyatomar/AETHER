@@ -46,13 +46,18 @@ setup_termux() {
     # Fast mode deliberately does NOT run pkg update/upgrade.
     # Install only missing runtime/build tools.
     local missing=()
-    for cmd in clang make pkg-config; do
+    for cmd in clang make pkg-config rustc cargo; do
         command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
     done
 
     if (( ${#missing[@]} > 0 )); then
         log "Installing missing build tools..."
-        pkg install -y clang make pkg-config
+        pkg install -y clang make pkg-config rust
+    fi
+
+    if ! command -v rustc >/dev/null 2>&1; then
+        log "Installing Rust toolchain required by Pydantic 2 on Android..."
+        pkg install -y rust
     fi
 
     log_ok "Termux environment ready"
@@ -89,6 +94,7 @@ create_venv() {
 
 install_package() {
     log "Installing AETHER and required dependencies..."
+    log "Android/Termux note: Pydantic 2 may build pydantic-core from Rust source on Python 3.14."
 
     # Do not force old Pydantic on Termux. AETHER uses Pydantic 2.
     if [[ "$CREATE_VENV" == true ]]; then
