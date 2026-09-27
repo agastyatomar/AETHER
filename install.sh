@@ -45,7 +45,7 @@ detect_os() {
     esac
     
     # Detect Termux
-    if [[ -n "${TERMUX_VERSION:-}" ]] || [[ "$PREFIX" == *"com.termux"* ]]; then
+    if [[ -n "${TERMUX_VERSION:-}" ]] || [[ "${PREFIX:-}" == *"com.termux"* ]]; then
         OS="termux"
     fi
     
