@@ -25,6 +25,8 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - name: Install Android NDK
         run: |
           yes | sdkmanager "ndk;${NDK_VERSION}" >/dev/null
