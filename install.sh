@@ -86,7 +86,7 @@ install_system_deps() {
                     libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 \
                     libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
                     libxdamage1 libxfixes3 libxrandr2 libgbm1 \
-                    libasound2 libpango-1.0-0 libcairo2
+                    libasound2t64 libpango-1.0-0 libcairo2
             elif command_exists dnf; then
                 sudo dnf install -y \
                     gcc gcc-c++ make python3-devel sqlite-devel \
@@ -169,7 +169,7 @@ install_browser() {
     log "Installing browser automation runtime..."
     
     local python_cmd="$VENV_DIR/bin/python"
-    [[ "$CREATE_VENV" != true ]] && python_cmd="python"
+    [[ "$CREATE_VENV" != true ]] && python_cmd="$PYTHON"
     
     # Run the managed browser installer
     "$python_cmd" -m aether.society.browser.install ${SYSTEM_DEPS:+--system-deps}
@@ -211,7 +211,11 @@ verify_install() {
     "$python_cmd" -c "import aether; print(f'AETHER {aether.__version__}')" 2>/dev/null || die "Core import failed"
     
     # Test CLI
-    "$VENV_DIR/bin/aether" --version 2>/dev/null || log_warn "CLI not in PATH (add $BIN_DIR)"
+    if [[ "$CREATE_VENV" == true ]]; then
+        "$VENV_DIR/bin/aether" --version 2>/dev/null || log_warn "CLI not in PATH (add $BIN_DIR)"
+    else
+        "$PYTHON" -m aether --version 2>/dev/null || log_warn "CLI verification skipped"
+    fi
     
     log_ok "Installation verified"
 }
