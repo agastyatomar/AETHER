@@ -44,20 +44,17 @@ setup_termux() {
     fi
 
     # Fast mode deliberately does NOT run pkg update/upgrade.
-    # Install only missing runtime/build tools.
+    # Install only the small native toolchain needed by the project itself.
+    # Do NOT install Rust here: stock Termux Rust cannot reliably build
+    # Python Rust extensions such as pydantic-core on all releases.
     local missing=()
-    for cmd in clang make pkg-config rustc cargo; do
+    for cmd in clang make pkg-config; do
         command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
     done
 
     if (( ${#missing[@]} > 0 )); then
-        log "Installing missing build tools..."
-        pkg install -y clang make pkg-config rust
-    fi
-
-    if ! command -v rustc >/dev/null 2>&1; then
-        log "Installing Rust toolchain required by Pydantic 2 on Android..."
-        pkg install -y rust
+        log "Installing missing build tools: ${missing[*]}..."
+        pkg install -y clang make pkg-config
     fi
 
     log_ok "Termux environment ready"
@@ -92,28 +89,39 @@ create_venv() {
     log_ok "Virtual environment created"
 }
 
+prepare_termux_pydantic() {
+    [[ "${PREFIX:-}" == *"com.termux"* ]] || return 0
+    local py_minor="${PYTHON_VERSION#*.}"
+    local py_cmd="$PYTHON"
+    [[ "$CREATE_VENV" == true ]] && py_cmd="$VENV_DIR/bin/python"
+
+    # PyPI does not publish Android/Termux pydantic-core wheels.
+    # For Python 3.9-3.13, use the maintained Android wheel index so
+    # installation does not spend ~15 minutes compiling Rust on-device.
+    if (( py_minor >= 9 && py_minor <= 13 )); then
+        log "Using prebuilt Android pydantic-core wheel for Python $PYTHON_VERSION..."
+        "$py_cmd" -m pip install --extra-index-url "https://eutalix.github.io/android-pydantic-core/" \
+            "pydantic==2.13.3" "pydantic-core==2.46.3"
+        log_ok "Android pydantic-core installed without local Rust compilation"
+        return 0
+    fi
+
+    if (( py_minor >= 14 )); then
+        log_warn "Python $PYTHON_VERSION detected on Termux."
+        log_warn "PyPI has CPython 3.14 wheels, but not Android/Termux wheels."
+        log_warn "The AETHER Android-wheel workflow provides the fast native path; source build remains a fallback."
+    fi
+}
+
 install_package() {
     log "Installing AETHER and required dependencies..."
-    log "Android/Termux note: Pydantic 2 may build pydantic-core from Rust source on Python 3.14."
+    prepare_termux_pydantic
 
-    # Do not force old Pydantic on Termux. AETHER uses Pydantic 2.
     if [[ "$CREATE_VENV" == true ]]; then
         "$VENV_DIR/bin/python" -m pip install -e "$INSTALL_DIR"
     else
         "$PYTHON" -m pip install -e "$INSTALL_DIR"
     fi
-
-    if [[ "$INSTALL_DEV" == true ]]; then
-        log "Installing development dependencies..."
-        if [[ "$CREATE_VENV" == true ]]; then
-            "$VENV_DIR/bin/python" -m pip install -r "$INSTALL_DIR/requirements-dev.txt"
-        else
-            "$PYTHON" -m pip install -r "$INSTALL_DIR/requirements-dev.txt"
-        fi
-    fi
-
-    log_ok "AETHER package installed"
-}
 
 install_browser() {
     [[ "$INSTALL_BROWSER" != true ]] && return 0
