@@ -58,7 +58,7 @@ jobs:
               "LDSHARED": "clang -shared", "LDFLAGS": "-L$MOCK_DIR", "CCSHARED": "-fPIC",
               "GNULD": "yes", "Py_DEBUG": 0, "WITH_PYMALLOC": 1,
           }
-EOF
+          EOF
           mkdir build-src && cd build-src
           pip download "pydantic-core==${PYDANTIC_CORE_VERSION}" --no-binary :all: --no-deps
           tar -xzf "pydantic_core-${PYDANTIC_CORE_VERSION}.tar.gz"
