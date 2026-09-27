@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">AETHER — AI Agent Orchestration</title>
+  <desc id="desc">A dark futuristic banner for the AETHER project.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05070d"/>
+      <stop offset="0.55" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="0.5" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="24"/></filter>
+  </defs>
+  <rect width="1200" height="320" rx="28" fill="url(#bg)"/>
+  <circle cx="180" cy="80" r="90" fill="#22d3ee" opacity=".16" filter="url(#blur)"/>
+  <circle cx="1000" cy="240" r="100" fill="#8b5cf6" opacity=".14" filter="url(#blur)"/>
+  <path d="M70 255 C260 145 350 300 520 185 S830 75 1130 170" fill="none" stroke="url(#glow)" stroke-width="2" opacity=".55"/>
+  <path d="M70 265 C260 155 350 310 520 195 S830 85 1130 180" fill="none" stroke="#fff" stroke-width="1" opacity=".12"/>
+  <g fill="#fff" opacity=".6">
+    <circle cx="96" cy="70" r="2"/><circle cx="330" cy="55" r="1.5"/><circle cx="760" cy="75" r="2"/>
+    <circle cx="1080" cy="80" r="1.5"/><circle cx="930" cy="250" r="2"/><circle cx="260" cy="235" r="1.5"/>
+  </g>
+  <text x="70" y="135" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="72" font-weight="800" letter-spacing="8">AETHER</text>
+  <text x="74" y="178" fill="#cbd5e1" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" letter-spacing="3">AI AGENT ORCHESTRATION • VOICE • TEXT • AUTOMATION</text>
+  <rect x="74" y="208" width="310" height="34" rx="17" fill="#0f172a" stroke="#334155"/>
+  <text x="229" y="231" text-anchor="middle" fill="#e2e8f0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="600">EXPERIMENTAL • PYTHON • TERMUX</text>
+</svg>
