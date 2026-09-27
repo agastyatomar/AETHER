@@ -15,7 +15,7 @@ setup(
     packages=find_packages(include=["aether*"]),
     python_requires=">=3.11",
     install_requires=[
-        "pydantic>=1.10,<2.0",
+        "pydantic>=2.8.0",
         "aiosqlite>=0.20.0",
         "filelock>=3.15.0",
     ],

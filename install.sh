@@ -152,6 +152,12 @@ install_package() {
     local pip_cmd="$VENV_DIR/bin/pip"
     [[ "$CREATE_VENV" != true ]] && pip_cmd="pip"
     
+    # ARM64: install pydantic v1 (pure Python) first to avoid Rust compilation
+    if [[ "$(uname -m)" == "aarch64" ]] || [[ "$OS" == "termux" ]]; then
+        log "ARM64 detected: installing pydantic v1 (no Rust)..."
+        "$pip_cmd" install "pydantic>=1.10,<2.0"
+    fi
+    
     # Install core package in editable mode
     "$pip_cmd" install -e "$INSTALL_DIR"
     
