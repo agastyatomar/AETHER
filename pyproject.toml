@@ -13,7 +13,7 @@ authors = [
     {name = "Agastya Tomar"}
 ]
 maintainers = [
-    {name = "Aadi Tomar", email = "agastyatomar@example.com"}
+    {name = "Aadi Tomar"}
 ]
 keywords = ["ai", "agents", "orchestration", "voice", "automation", "browser-automation"]
 classifiers = [
