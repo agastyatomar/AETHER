@@ -33,7 +33,7 @@ log_err() { echo -e "${RED}[✗]${NC} $*" >&2; }
 die() { log_err "$*"; exit 1; }
 
 setup_termux() {
-    log "Checking Termux environment (fast mode)..."
+    log "Checking Termux environment..."
 
     command -v pkg >/dev/null 2>&1 || die "This installer is for Termux. Run it inside Termux."
     command -v git >/dev/null 2>&1 || { log "Installing git..."; pkg install -y git; }
@@ -90,9 +90,6 @@ create_venv() {
 install_package() {
     log "Installing AETHER and required dependencies..."
 
-    local pip_cmd="$VENV_DIR/bin/pip"
-    [[ "$CREATE_VENV" != true ]] && pip_cmd="$PYTHON -m pip"
-
     # Do not force old Pydantic on Termux. AETHER uses Pydantic 2.
     if [[ "$CREATE_VENV" == true ]]; then
         "$VENV_DIR/bin/python" -m pip install -e "$INSTALL_DIR"
@@ -102,7 +99,11 @@ install_package() {
 
     if [[ "$INSTALL_DEV" == true ]]; then
         log "Installing development dependencies..."
-        "$VENV_DIR/bin/python" -m pip install -r "$INSTALL_DIR/requirements-dev.txt"
+        if [[ "$CREATE_VENV" == true ]]; then
+            "$VENV_DIR/bin/python" -m pip install -r "$INSTALL_DIR/requirements-dev.txt"
+        else
+            "$PYTHON" -m pip install -r "$INSTALL_DIR/requirements-dev.txt"
+        fi
     fi
 
     log_ok "AETHER package installed"
@@ -158,7 +159,11 @@ print_summary() {
     echo -e "${BOLD}Run:${NC} ${CYAN}aether --help${NC}"
     echo -e "${BOLD}Activate:${NC} ${CYAN}source $VENV_DIR/bin/activate${NC}"
     echo
-    echo -e "${YELLOW}Fast mode was used. No full pkg upgrade was performed.${NC}"
+    if [[ "$FAST" == true ]]; then
+        echo -e "${YELLOW}Fast mode: no full pkg update/upgrade was performed.${NC}"
+    else
+        echo -e "${YELLOW}Full mode: Termux packages were updated/upgraded.${NC}"
+    fi
     echo
 }
 
