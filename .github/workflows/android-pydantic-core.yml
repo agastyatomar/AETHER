@@ -1,0 +1,84 @@
+name: Android pydantic-core Wheel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/android-pydantic-core.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHON_VERSION: "3.14"
+  PYDANTIC_CORE_VERSION: "2.46.3"
+  NDK_VERSION: "25.2.9519653"
+  ANDROID_API: "24"
+  RELEASE_TAG: "termux-pydantic-core-2.46.3"
+
+jobs:
+  build-aarch64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+      - uses: android-actions/setup-android@v3
+      - name: Install Android NDK
+        run: |
+          yes | sdkmanager "ndk;${NDK_VERSION}" >/dev/null
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+      - name: Setup Rust
+        run: |
+          curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          rustup target add aarch64-linux-android
+          pip install maturin
+      - name: Build wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          source "$HOME/.cargo/env"
+          NDK_BIN="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          NDK_SYSROOT="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+          export PATH="$NDK_BIN:$PATH"
+          MOCK_DIR="$GITHUB_WORKSPACE/mock_libs"
+          mkdir -p "$MOCK_DIR"
+          "$NDK_BIN/clang" --target="aarch64-linux-android${ANDROID_API}" -shared -Wl,-soname,libpython3.14.so -o "$MOCK_DIR/libpython3.14.so" -xc /dev/null
+          LIBDL_PATH=$(find "$NDK_SYSROOT" -name libdl.so | grep aarch64-linux-android | head -n 1)
+          test -n "$LIBDL_PATH"
+          cp "$LIBDL_PATH" "$MOCK_DIR/"
+          SYSCONFIG_NAME="_sysconfigdata__linux_aarch64-linux-android"
+          cat > "$MOCK_DIR/${SYSCONFIG_NAME}.py" <<EOF
+build_time_vars = {
+    "abiflags": "", "ABIFLAGS": "", "SO": ".so", "SOABI": "cpython-314",
+    "EXT_SUFFIX": ".so", "LIBDIR": "$MOCK_DIR", "LDLIBRARY": "libpython3.14.so",
+    "Py_ENABLE_SHARED": 1, "CC": "clang", "CXX": "clang++", "VERSION": "3.14",
+    "LDSHARED": "clang -shared", "LDFLAGS": "-L$MOCK_DIR", "CCSHARED": "-fPIC",
+    "GNULD": "yes", "Py_DEBUG": 0, "WITH_PYMALLOC": 1,
+}
+EOF
+          mkdir build-src && cd build-src
+          pip download "pydantic-core==${PYDANTIC_CORE_VERSION}" --no-binary :all: --no-deps
+          tar -xzf "pydantic_core-${PYDANTIC_CORE_VERSION}.tar.gz"
+          cd "pydantic_core-${PYDANTIC_CORE_VERSION}"
+          export PYO3_CROSS_LIB_DIR="$MOCK_DIR"
+          export PYTHONPATH="$MOCK_DIR"
+          export PYO3_CROSS_PYTHON_VERSION="3.14"
+          export _PYTHON_SYSCONFIGDATA_NAME="$SYSCONFIG_NAME"
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$NDK_BIN/aarch64-linux-android${ANDROID_API}-clang"
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_RUSTFLAGS="-L native=$MOCK_DIR -C link-arg=--target=aarch64-linux-android${ANDROID_API} -C link-arg=-Wl,--no-as-needed -C link-arg=-lpython3.14 -C link-arg=-Wl,--as-needed -C link-arg=-Wl,--unresolved-symbols=ignore-all -C link-arg=-Wl,-rpath=/data/data/com.termux/files/usr/lib"
+          maturin build --release --strip --target aarch64-linux-android --interpreter python3.14 --skip-auditwheel
+          wheel=$(ls target/wheels/pydantic_core-*.whl)
+          mv "$wheel" "$GITHUB_WORKSPACE/pydantic_core-2.46.3-cp314-cp314-linux_aarch64.whl"
+          python -m zipfile -t "$GITHUB_WORKSPACE/pydantic_core-2.46.3-cp314-cp314-linux_aarch64.whl"
+          sha256sum "$GITHUB_WORKSPACE/pydantic_core-2.46.3-cp314-cp314-linux_aarch64.whl"
+      - name: Publish wheel
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "${{ env.RELEASE_TAG }}"
+          name: "AETHER Termux pydantic-core ${{ env.PYDANTIC_CORE_VERSION }}"
+          body: "Prebuilt Android/Termux wheel for CPython 3.14 aarch64 (API 24)."
+          files: pydantic_core-2.46.3-cp314-cp314-linux_aarch64.whl
+          make_latest: false
