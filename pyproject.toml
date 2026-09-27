@@ -28,7 +28,7 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "pydantic>=1.10,<2.0",
+    "pydantic>=2.8.0",
     "aiosqlite>=0.20.0",
     "filelock>=3.15.0",
 ]
@@ -54,7 +54,7 @@ web = [
     "uvicorn>=0.29.0",
 ]
 termux = [
-    "pydantic>=1.10,<2.0",
+    "pydantic>=2.8.0",
     "aiosqlite>=0.20.0",
     "filelock>=3.15.0",
 ]
