@@ -107,9 +107,21 @@ prepare_termux_pydantic() {
     fi
 
     if (( py_minor >= 14 )); then
-        log_warn "Python $PYTHON_VERSION detected on Termux."
-        log_warn "PyPI has CPython 3.14 wheels, but not Android/Termux wheels."
-        log_warn "The AETHER Android-wheel workflow provides the fast native path; source build remains a fallback."
+        log "Python $PYTHON_VERSION detected on Termux; using the AETHER prebuilt Android wheel."
+        local arch
+        arch="$(uname -m)"
+        if [[ "$arch" != "aarch64" ]]; then
+            die "Prebuilt Termux Python $PYTHON_VERSION wheel currently targets aarch64. Detected: $arch"
+        fi
+        local wheel_url="https://github.com/agastyatomar/AETHER/releases/download/termux-pydantic-core-2.46.3/pydantic_core-2.46.3-cp314-cp314-linux_aarch64.whl"
+        local wheel_file="$INSTALL_DIR/.cache/pydantic_core-2.46.3-cp314-cp314-linux_aarch64.whl"
+        mkdir -p "$(dirname "$wheel_file")"
+        if command -v curl >/dev/null 2>&1 && curl -fsSL --retry 3 -o "$wheel_file" "$wheel_url"; then
+            "$py_cmd" -m pip install "$wheel_file"
+            log_ok "Prebuilt Android pydantic-core installed"
+            return 0
+        fi
+        die "Android pydantic-core wheel is not published yet. Run the AETHER GitHub Action \"Android pydantic-core Wheel\", wait for it to finish, then rerun this installer."
     fi
 }
 
