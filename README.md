@@ -6,6 +6,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Build Status](https://github.com/agastyatomar/AETHER/workflows/CI/badge.svg)](https://github.com/agastyatomar/AETHER/actions)
 [![Coverage](https://img.shields.io/badge/coverage-80%25%2B-brightgreen.svg)](https://github.com/agastyatomar/AETHER/actions)
+[![ARM64](https://img.shields.io/badge/ARM64-compatible-orange.svg)](https://github.com/agastyatomar/AETHER)
+[![Termux](https://img.shields.io/badge/Termux-supported-green.svg)](https://github.com/agastyatomar/AETHER)
 
 ---
 
@@ -48,6 +50,16 @@ AETHER is a meta-orchestration framework that transforms natural language reques
   - **macOS**: Xcode Command Line Tools
   - **Termux**: `pkg install python build-essential libsqlite`
 
+### Quick Install (PyPI)
+
+```bash
+# Install from PyPI (when published)
+pip install aether
+
+# Or install directly from GitHub (always latest)
+pip install git+https://github.com/agastyatomar/AETHER.git
+```
+
 ### One-Line Install (All Platforms)
 
 ```bash
@@ -77,6 +89,21 @@ pip install -r requirements-dev.txt
 
 # Install browser automation (optional, creates isolated venv)
 aether-browser-install --system-deps
+```
+
+### ARM64 / Termux / Android
+
+AETHER uses **pydantic v1** (pure Python) for ARM64 compatibility — no Rust compilation required.
+
+```bash
+# Termux (Android)
+pkg update && pkg install -y git python build-essential libsqlite openssl
+git clone https://github.com/agastyatomar/AETHER.git
+cd AETHER
+./install-termux.sh
+
+# Or manual
+pip install -e .
 ```
 
 ### Verify Installation
