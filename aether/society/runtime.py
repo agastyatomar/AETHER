@@ -1071,3 +1071,69 @@ class SocietyRuntime:
     @property
     def lead_id(self) -> str:
         return LEAD_AGENT_ID
+
+
+def main() -> int:
+    """Entry point for aether-society command."""
+    import sys
+    import json
+    import asyncio
+    from pathlib import Path
+    
+    from aether.core.config import DATA_DIR
+    from .store import SocietyStore
+    from .roster import Roster
+    from .rooms import Rooms
+    from .quests import Quests
+    from .scheduler import SocietyScheduler
+    from .bridge import MissionBridge
+    from .approvals import Approvals
+    from .learning import AgentSkills
+    from .memory import SocietyMemory
+    from .checkpoints import CheckpointEngine
+    from .world_feed import WorldFeed
+    from .conversation import ConversationArchive
+    
+    async def run() -> dict:
+        store = SocietyStore(DATA_DIR / "society" / "society.db")
+        await store.init()
+        
+        roster = Roster(store)
+        await roster.init()
+        
+        rooms = Rooms(store)
+        await rooms.init()
+        
+        quests = Quests(store)
+        await quests.init()
+        
+        scheduler = SocietyScheduler(store, roster, rooms, quests)
+        
+        bridge = MissionBridge(store, roster, rooms, quests, scheduler)
+        
+        approvals = Approvals(store)
+        
+        skills = AgentSkills(store)
+        
+        memory = SocietyMemory(store)
+        
+        checkpoints = CheckpointEngine(store)
+        
+        world_feed = WorldFeed(store)
+        
+        conversation = ConversationArchive(store)
+        
+        return {"status": "initialized", "db": str(store.path)}
+    
+    try:
+        result = asyncio.run(run())
+        print(json.dumps(result))
+        return 0
+    except Exception as e:
+        print(json.dumps({"error": str(e)}), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

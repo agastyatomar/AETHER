@@ -376,5 +376,18 @@ def _reset_for_tests() -> None:
         _THREADS.clear()
 
 
+def main() -> int:
+    """Entry point for aether-browser-install command."""
+    import sys
+    try:
+        result = ensure_installed(system_dependencies="--system-deps" in sys.argv)
+        print(json.dumps(result))
+        return 0
+    except Exception as e:
+        print(json.dumps({"error": str(e)}), file=sys.stderr)
+        return 1
+
+
 if __name__ == "__main__":
-    print(json.dumps(ensure_installed(system_dependencies="--system-deps" in sys.argv)))
+    import sys
+    sys.exit(main())
