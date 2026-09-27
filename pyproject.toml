@@ -50,6 +50,7 @@ browser = [
     "playwright>=1.62.0",
 ]
 web = [
+    "pydantic>=2.8.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
 ]
