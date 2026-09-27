@@ -12,7 +12,7 @@ from typing import Any
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 app = FastAPI(title="AETHER Web UI", version="0.1.0")
@@ -25,11 +25,12 @@ class RequestPayload(BaseModel):
 
 class CommandPayload(BaseModel):
     command: str
-    args: list[str] = []
+    args: list[str] = Field(default_factory=list)
 
 
 DEMO_MODE = os.getenv("AETHER_DEMO_MODE", "").lower() in {"1", "true", "yes"}
 SAFE_COMMANDS = {"aether", "aether-society", "aether-browser-install"}
+COMMAND_MODULES = {"aether": "aether", "aether-society": "aether.society.runtime", "aether-browser-install": "aether.society.browser.install"}
 
 
 @app.get("/")
@@ -319,9 +320,8 @@ async def run_command(payload: CommandPayload) -> dict[str, Any]:
     if payload.command not in SAFE_COMMANDS:
         return {"output": ["Command is not allow-listed."], "returncode": 403}
     try:
-        cmd = [payload.command] + payload.args
         proc = subprocess.run(
-            [sys.executable, "-m"] + cmd if not cmd[0].startswith('aether') else [sys.executable, "-m"] + cmd,
+            [sys.executable, "-m", COMMAND_MODULES[payload.command], *payload.args],
             capture_output=True,
             text=True,
             timeout=300,
