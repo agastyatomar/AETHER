@@ -35,6 +35,10 @@ setup(
             "browser-use>=0.13.10",
             "playwright>=1.62.0",
         ],
+        "web": [
+            "fastapi>=0.110.0",
+            "uvicorn>=0.29.0",
+        ],
     },
     entry_points={
         "console_scripts": [

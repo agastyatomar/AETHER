@@ -20,6 +20,24 @@ def main() -> int:
         print(f"AETHER {__version__}")
         return 0
 
+    if len(sys.argv) > 1 and sys.argv[1] == "web":
+        try:
+            from aether.web.server import run_server
+        except ImportError as e:
+            print(f"Web UI dependencies not installed: {e}")
+            print("Install with: pip install 'aether[web]'")
+            return 1
+        host = "127.0.0.1"
+        port = 8080
+        for i, arg in enumerate(sys.argv[2:], 2):
+            if arg in ("--host", "-h") and i + 1 < len(sys.argv):
+                host = sys.argv[i + 1]
+            elif arg in ("--port", "-p") and i + 1 < len(sys.argv):
+                port = int(sys.argv[i + 1])
+        print(f"Starting AETHER Web UI at http://{host}:{port}")
+        run_server(host, port)
+        return 0
+
     print("AETHER - Voice-driven meta-orchestrator for AI agents")
     print(f"Version: {__version__}")
     print()
@@ -33,6 +51,7 @@ def main() -> int:
     print("  docs              Documentation tools")
     print("  browser           Browser automation tools")
     print("  config            Configuration management")
+    print("  web               Start local web UI")
     print("  version           Show version")
     print()
     print("For more information, visit: https://github.com/agastyatomar/AETHER")

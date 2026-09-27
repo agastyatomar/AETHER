@@ -50,6 +50,10 @@ browser = [
     "browser-use>=0.13.10",
     "playwright>=1.62.0",
 ]
+web = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.29.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/agastyatomar/AETHER"
