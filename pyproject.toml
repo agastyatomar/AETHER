@@ -53,6 +53,11 @@ web = [
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
 ]
+termux = [
+    "pydantic>=1.10,<2.0",
+    "aiosqlite>=0.20.0",
+    "filelock>=3.15.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/agastyatomar/AETHER"
